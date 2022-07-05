@@ -1,46 +1,36 @@
-
-let newCountry = document.createElement("option");
-newCountry.value = "Bolivia";
-newCountry.id = "BO";
-newCountry.text = "Bolivia";
-
-let selectContry = document.getElementById('selectContry');
-
+/* La base de datos de paises regiones esta incorrecta, en chile da Marga Marga que es una provincia */
 
 /*Aseguramos que se cargue window antes de empezar a crear y generar elementos*/
 window.onload = () => {
     let countriesSelector = document.getElementById('countries');
+    let selectCountry = document.getElementById('selectCountry');
     getCountries().then(data => {
         for (let i = 0; i < data.length; i++) {
             let newCountry = document.createElement("option");
-            newCountry.value = data[i].country;
-            newCountry.id = data[i].code;
+            newCountry.value = data[i].code;
             newCountry.text = data[i].country;
             countriesSelector.appendChild(newCountry);
         }
     }).catch(error => {
         console.log(error);
     });
-    selectContry.onclick = () => {
-        let countrySelector = document.getElementById('countries');
+    selectCountry.onclick = () => {
         
-        getCities(countryCode).then(data => {
-            let citiesSelector = document.getElementById('cities');
-            citiesSelector.innerHTML = '';
+        let countriesSelector = document.getElementById('countries');
+        let countryCode = countriesSelector.options[countriesSelector.selectedIndex].value;
+        console.log(`Se ingresa a elegir region con codigo ${countryCode}`);
+        getRegions(countryCode).then(data => {
+            let regionSelector = document.getElementById('region');
+            removeAllChildNodes(regionSelector);
+            console.log(regionSelector);
             for (let i = 0; i < data.length; i++) {
-                let newCity = document.createElement("option");
-                newCity.value = data[i].city;
-                newCity.id = data[i].code;
-                newCity.text = data[i].city;
-                citiesSelector.appendChild(newCity);
-            }
-
-    });
-
-    getCities(`CN`).then(
-        console.log('request success')
-    );
-}};
+                let newRegion = document.createElement("option");
+                newRegion.value = data[i].shortCode;
+                newRegion.text = data[i].name;
+                regionSelector.appendChild(newRegion);
+            }}).catch(error => {console.log(error);});
+    }
+};
 
 const getCountries = async () =>{
     try {
@@ -60,8 +50,8 @@ const getCountries = async () =>{
     }
 }
 
-const getCities = async (countryCode) =>{
-    console.log('getcities called');
+const getRegions = async (countryCode) =>{
+    console.log('getRegions called');
     try {
         let response = await fetch(`http://localhost:4001/${countryCode}/cities`, {
             method: 'GET',
@@ -78,5 +68,9 @@ const getCities = async (countryCode) =>{
     }
     }
 
-let countries = getCountries();
 
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
