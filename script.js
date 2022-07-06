@@ -18,11 +18,10 @@ window.onload = () => {
         
         let countriesSelector = document.getElementById('countries');
         let countryCode = countriesSelector.options[countriesSelector.selectedIndex].value;
-        console.log(`Se ingresa a elegir region con codigo ${countryCode}`);
+        console.log(`Se ingresa a elegir regiones de pais con codigo ${countryCode}`);
         getRegions(countryCode).then(data => {
             let regionSelector = document.getElementById('region');
             removeAllChildNodes(regionSelector);
-            console.log(regionSelector);
             for (let i = 0; i < data.length; i++) {
                 let newRegion = document.createElement("option");
                 newRegion.value = data[i].shortCode;
@@ -51,7 +50,6 @@ const getCountries = async () =>{
 }
 
 const getRegions = async (countryCode) =>{
-    console.log('getRegions called');
     try {
         let response = await fetch(`http://localhost:4001/${countryCode}/cities`, {
             method: 'GET',
@@ -61,7 +59,6 @@ const getRegions = async (countryCode) =>{
         });
         let data = await response.json();
         if (response.ok){
-            console.log(data)
             return data;
         }
     } catch (error){
