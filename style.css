@@ -1,0 +1,11 @@
+#findSpot{
+    display: none;
+}
+
+#spotPresenter{
+    margin-top: 20px;
+}
+
+table, th, td{
+    border: 1px solid black;
+}
