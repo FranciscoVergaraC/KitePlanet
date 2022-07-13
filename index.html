@@ -29,12 +29,35 @@
                     <th>Country</th>
                     <th>Region</th>
                     <th>Wind Direction</th>
+                    <th>Edit</th>
                 </tr>
             </thead>
             <tbody id="spotList">
             </tbody>
         </table>
-
     </div>
+    <button data-modal-target="#modal">Open Modal</button>
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <div class="title">Edit Spot</div>
+            <button data-close-button class="close-button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Country</th>
+                        <th>Region</th>
+                        <th>Wind Direction</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody id="spoEdittList">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="overlay"></div>
 </body>
 </html>

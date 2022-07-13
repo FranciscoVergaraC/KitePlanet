@@ -1,4 +1,4 @@
-/* La base de datos de paises regiones esta incorrecta, en chile da Marga Marga que es una provincia */
+/* Pendiente: La base de datos de paises regiones esta incorrecta, en chile da Marga Marga que es una provincia */
 
 /*Aseguramos que se cargue window antes de empezar a crear y generar elementos*/
 window.onload = () => {
@@ -6,6 +6,38 @@ window.onload = () => {
     let selectCountry = document.getElementById('selectCountry');
     let findSpot = document.getElementById('findSpot');
     let spotList = document.getElementById('spotList');
+    
+    /* Aca comienza la funcionalidad de un modal que saque de este tutorial:  https://www.youtube.com/watch?v=MBaw_6cPmAw -----------------------*/
+    
+    const openModalButtons = document.querySelectorAll('[data-modal-target]');
+    const closeModalButtons = document.querySelectorAll('[data-close-button]');
+    const overlay = document.getElementById('overlay');
+    openModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = document.querySelector(button.dataset.modalTarget);
+            openModal(modal);
+        }
+        );
+    });
+
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            closeModal(modal);
+        }
+        );
+    });
+
+    overlay.addEventListener('click', ()=>{
+        const modals = document.querySelectorAll('.modal.active');
+        modals.forEach(modal => {
+            closeModal(modal);
+        }
+        );
+    })
+
+    /* ---------- Hasta aca llega la funcionalidad del overlay */
+
     getCountries().then(data => {
         populateList(countriesSelector, "option", data, "code", "country")
     }).catch(error => {
@@ -35,15 +67,25 @@ window.onload = () => {
                     spotRegion.innerHTML = data.rows[i].regionCode;
                     let windDirection = document.createElement('td');
                     windDirection.innerHTML = data.rows[i].windDirection;
+                    let editSpot = document.createElement('td');
+                    let editButton = document.createElement('button');
+                    editButton.innerHTML = "Edit";
+                    editButton.onclick = () => {};
+                    editSpot.appendChild(editButton);
                     newSpot.appendChild(newSpotName);
                     newSpot.appendChild(spotCountry);
                     newSpot.appendChild(spotRegion);
                     newSpot.appendChild(windDirection);
+                    newSpot.appendChild(editSpot);
                     spotList.appendChild(newSpot);
                 }
             });}
     }
 };
+
+const editSpotButton = async (spot) => {
+
+}
 
 
 const populateList = (elementId, htmlType, data, value, text) => {
@@ -115,3 +157,17 @@ const getRegions = async (countryCode) =>{
         }
     }
 
+function openModal (modal) {
+    if(modal == null) return 
+    else{
+    modal.classList.add('active');
+    overlay.classList.add('active');
+}
+}
+
+
+function closeModal (modal) {
+    if(modal ==null) return
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+}
