@@ -12,6 +12,7 @@ window.onload = () => {
     const openModalButtons = document.querySelectorAll('[data-modal-target]');
     const closeModalButtons = document.querySelectorAll('[data-close-button]');
     const overlay = document.getElementById('overlay');
+
     openModalButtons.forEach(button => {
         button.addEventListener('click', () => {
             const modal = document.querySelector(button.dataset.modalTarget);
@@ -54,7 +55,7 @@ window.onload = () => {
 
         }).catch(error => {console.log(error);});
             findSpot.style.display = "inline";
-            findSpot.onclick = () => {
+            findSpot.onclick = () => { /* Al hacer click en buscar spot populamos la tabla */
                 get('spot').then(data => {    
                 removeAllChildNodes(spotList);
                 for(let i=0; i<data.rows.length; i++){
@@ -70,7 +71,49 @@ window.onload = () => {
                     let editSpot = document.createElement('td');
                     let editButton = document.createElement('button');
                     editButton.innerHTML = "Edit";
-                    editButton.onclick = () => {};
+                    editButton.dataset.modalTarget = '#modal'
+                    editButton.onclick = () => {
+                        const modal = document.querySelector(editButton.dataset.modalTarget);
+                        const spotEditList = document.getElementById('spotEditList');
+                        removeAllChildNodes(spotEditList);
+                        let newSpotEdit = document.createElement('tr');
+
+                        let newSpotNameEdit = document.createElement('td');
+                        let spotName = document.createElement('input');
+                        spotName.value = data.rows[i].name;
+                        newSpotNameEdit.appendChild(spotName);
+                        newSpotEdit.appendChild(newSpotNameEdit);
+                        spotEditList.appendChild(newSpotEdit);
+
+                        let newSpotCountryEdit = document.createElement('td');
+                        let countryName = document.createElement('input');
+                        countryName.value = data.rows[i].countryCode;
+                        newSpotCountryEdit.appendChild(countryName);
+                        newSpotEdit.appendChild(newSpotCountryEdit);
+                        spotEditList.appendChild(newSpotEdit);
+
+                        let newSpotRegionEdit = document.createElement('td');
+                        let regionName = document.createElement('input');
+                        regionName.value = data.rows[i].regionCode;
+                        newSpotRegionEdit.appendChild(regionName);
+                        newSpotEdit.appendChild(newSpotRegionEdit);
+                        spotEditList.appendChild(newSpotEdit);
+
+                        let newSpotWindDirectionEdit = document.createElement('td');
+                        let windDirectionName = document.createElement('input');
+                        windDirection.value = data.rows[i].windDirection;
+                        newSpotWindDirectionEdit.appendChild(windDirectionName);
+                        newSpotEdit.appendChild(newSpotWindDirectionEdit);
+                        spotEditList.appendChild(newSpotEdit);
+
+                        let editSpot = document.createElement('td');
+                        let innerEditButton = document.createElement('button');
+                        innerEditButton.innerHTML = "Edit";
+                        editSpot.appendChild(innerEditButton);
+                        newSpotEdit.appendChild(editSpot);
+
+                        openModal(modal);
+                    };
                     editSpot.appendChild(editButton);
                     newSpot.appendChild(newSpotName);
                     newSpot.appendChild(spotCountry);
