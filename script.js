@@ -6,7 +6,7 @@ window.onload = () => {
     let selectCountry = document.getElementById('selectCountry');
     let findSpot = document.getElementById('findSpot');
     let spotList = document.getElementById('spotList');
-    
+
     /* Aca comienza la funcionalidad de un modal que saque de este tutorial:  https://www.youtube.com/watch?v=MBaw_6cPmAw -----------------------*/
     
     const openModalButtons = document.querySelectorAll('[data-modal-target]');
@@ -58,7 +58,7 @@ window.onload = () => {
             findSpot.onclick = () => { /* Al hacer click en buscar spot populamos la tabla */
                 get('spot').then(data => {    
                 removeAllChildNodes(spotList);
-                for(let i=0; i<data.rows.length; i++){
+                for(let i=0; i<data.rows.length; i++){ /*Poblamos la lista de spots existentes*/ 
                     let newSpot = document.createElement('tr');
                     let newSpotName = document.createElement('td');
                     newSpotName.innerHTML = data.rows[i].name;
@@ -68,14 +68,19 @@ window.onload = () => {
                     spotRegion.innerHTML = data.rows[i].regionCode;
                     let windDirection = document.createElement('td');
                     windDirection.innerHTML = data.rows[i].windDirection;
+                    let spotID = document.createElement('td');
+                    spotID.innerHTML = data.rows[i].id;
                     let editSpot = document.createElement('td');
                     let editButton = document.createElement('button');
                     editButton.innerHTML = "Edit";
                     editButton.dataset.modalTarget = '#modal'
-                    editButton.onclick = () => {
+                    editButton.onclick = () => { /* Al hacer click en editar abrimos modal */
                         const modal = document.querySelector(editButton.dataset.modalTarget);
                         const spotEditList = document.getElementById('spotEditList');
                         removeAllChildNodes(spotEditList);
+
+                        /*Poblamos la tabla del modal con los datos del spot a editar */
+
                         let newSpotEdit = document.createElement('tr');
 
                         let newSpotNameEdit = document.createElement('td');
@@ -106,12 +111,18 @@ window.onload = () => {
                         newSpotEdit.appendChild(newSpotWindDirectionEdit);
                         spotEditList.appendChild(newSpotEdit);
 
+                        let newSpotId = document.createElement('td');
+                        newSpotId.innerHTML = data.rows[i].id;
+                        newSpotEdit.appendChild(newSpotId);
+
                         let editSpot = document.createElement('td');
                         let innerEditButton = document.createElement('button');
                         innerEditButton.innerHTML = "Edit";
+                        innerEditButton.id = 'editSpot';
                         editSpot.appendChild(innerEditButton);
                         newSpotEdit.appendChild(editSpot);
-
+                        let recognizedButton = document.getElementById('editSpot')
+                        recognizedButton.onclick = editSpotOnDb;
                         openModal(modal);
                     };
                     editSpot.appendChild(editButton);
@@ -119,17 +130,28 @@ window.onload = () => {
                     newSpot.appendChild(spotCountry);
                     newSpot.appendChild(spotRegion);
                     newSpot.appendChild(windDirection);
+                    newSpot.appendChild(spotID);
                     newSpot.appendChild(editSpot);
                     spotList.appendChild(newSpot);
                 }
             });}
     }
+
 };
 
-const editSpotButton = async (spot) => {
 
+
+const editSpotOnDb = (event) => {
+    const basePath = event.path
+    const spotName = basePath[2].childNodes[0].children[0].value;
+    const spotCountry = basePath[2].childNodes[1].children[0].value;
+    const spotRegion = basePath[2].childNodes[2].children[0].value;
+    const spotWindDirection = basePath[2].childNodes[3].children[0].value;
+    const spotId = basePath[2].childNodes[4].innerHTML;
+    /* Ya tenemos todos los datos que el usuario quiere mandare en el formulario de edicion de Spot
+    ahora toca crear el fetch y enviar, en el backen ya estan probadas las SQL*/
+    console.log(`Se enviara una consulta con los siguientes datos: Name: ${spotName}, Country: ${spotCountry}, Region: ${spotRegion}, WindDirection: ${spotWindDirection}, Id: ${spotId}`);
 }
-
 
 const populateList = (elementId, htmlType, data, value, text) => {
     for(let i = 0; i < data.length; i++){

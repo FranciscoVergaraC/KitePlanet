@@ -20,7 +20,7 @@ table, th, td{
     border-radius: 10px;
     z-index: 10;
     background-color: white;
-    width: 500px;
+    min-width: 800px;
     max-width: 80%;
 }
 
