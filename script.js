@@ -6,6 +6,8 @@ window.onload = () => {
     let selectCountry = document.getElementById('selectCountry');
     let findSpot = document.getElementById('findSpot');
     let spotList = document.getElementById('spotList');
+    let selectRegion = document.getElementById('regionSelector');
+    let countryData; 
 
     /* Aca comienza la funcionalidad de un modal que saque de este tutorial:  https://www.youtube.com/watch?v=MBaw_6cPmAw -----------------------*/
     
@@ -40,6 +42,7 @@ window.onload = () => {
     /* ---------- Hasta aca llega la funcionalidad del overlay */
 
     getCountries().then(data => {
+        countryData = data;
         populateList(countriesSelector, "option", data, "code", "country")
     }).catch(error => {
         console.log(error);
@@ -48,6 +51,7 @@ window.onload = () => {
         let countriesSelector = document.getElementById('countries');
         let countryCode = countriesSelector.options[countriesSelector.selectedIndex].value;
         console.log(`Se ingresa a elegir regiones de pais con codigo ${countryCode}`);
+        selectRegion.style.display = "inline";
         getRegions(countryCode).then(data => {
             let regionSelector = document.getElementById('region');
             removeAllChildNodes(regionSelector);
@@ -91,8 +95,10 @@ window.onload = () => {
                         spotEditList.appendChild(newSpotEdit);
 
                         let newSpotCountryEdit = document.createElement('td');
-                        let countryName = document.createElement('input');
-                        countryName.value = data.rows[i].countryCode;
+                        let countryName = document.createElement('select');
+                        populateList(countryName, "option", countryData, "code", "country");
+                        countryName.selectedOptions[0].value = data.rows[i].countryCode;
+                        /*countryName.value = data.rows[i].countryCode;*/
                         newSpotCountryEdit.appendChild(countryName);
                         newSpotEdit.appendChild(newSpotCountryEdit);
                         spotEditList.appendChild(newSpotEdit);
@@ -141,19 +147,40 @@ window.onload = () => {
 
 
 
-const editSpotOnDb = (event) => {
+const editSpotOnDb = async (event) => {
     const basePath = event.path
     const spotName = basePath[2].childNodes[0].children[0].value;
     const spotCountry = basePath[2].childNodes[1].children[0].value;
     const spotRegion = basePath[2].childNodes[2].children[0].value;
     const spotWindDirection = basePath[2].childNodes[3].children[0].value;
     const spotId = basePath[2].childNodes[4].innerHTML;
-    /* Ya tenemos todos los datos que el usuario quiere mandare en el formulario de edicion de Spot
-    ahora toca crear el fetch y enviar, en el backen ya estan probadas las SQL*/
     console.log(`Se enviara una consulta con los siguientes datos: Name: ${spotName}, Country: ${spotCountry}, Region: ${spotRegion}, WindDirection: ${spotWindDirection}, Id: ${spotId}`);
+    try {
+        const response = await fetch('http://localhost:4001/spotEdit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: spotName,
+                countryCode: spotCountry,
+                regionCode: spotRegion,
+                windDirection: spotWindDirection,
+                id: spotId
+            })
+        });
+        const data = await response.json();
+        alert("Spot editado con exito");
+        closeModal(modal);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
+/*populateList(countryName, "option", countryData, "shortCode", "name"); */
+
 const populateList = (elementId, htmlType, data, value, text) => {
+    console.log(`se ingresa a populate con un data de: ${data.length}`)
     for(let i = 0; i < data.length; i++){
         let newElement = document.createElement(htmlType);
         newElement.value = data[i][value];
@@ -175,7 +202,6 @@ const getCountries = async () =>{
             return data;
         }
     } catch (error){
-        // TODO: Manejor de errores
         console.log(error);
     }
 }

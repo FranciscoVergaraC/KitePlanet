@@ -2,6 +2,10 @@
     display: none;
 }
 
+#regionSelector{
+    display: none;
+}
+
 #spotPresenter{
     margin-top: 20px;
 }

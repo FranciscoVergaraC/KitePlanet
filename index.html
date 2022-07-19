@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KitePlanet</title>
+    <title>KitePlanet Admin</title>
     <script src="./script.js"></script>
     <link rel="stylesheet" href="style.css">
 
@@ -15,10 +15,12 @@
         <select name="countries" id="countries">
         </select>
         <button id="selectCountry">Select Country</button>
-        <label for="region">Select Region</label>
-        <select name="region" id="region"></select>
-        <button id="findSpot">Find Spots</button>
-        <br>
+        <div id="regionSelector">
+            <label for="region">Select Region</label>
+            <select name="region" id="region"></select>
+            <button id="findSpot">Find Spots</button>
+            <br>
+        </div>
     </div>
 
     <div id="spotPresenter">
@@ -37,7 +39,7 @@
             </tbody>
         </table>
     </div>
-    <button data-modal-target="#modal">Open Modal</button> <!-- data- atribute sirve para agregar data custom a elementos https://www.w3schools.com/tags/att_data-.asp -->
+     <!-- data- atribute sirve para agregar data custom a elementos https://www.w3schools.com/tags/att_data-.asp -->
     <div class="modal" id="modal">
         <div class="modal-header">
             <div class="title">Edit Spot</div>
