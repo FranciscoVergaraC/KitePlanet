@@ -10,19 +10,12 @@
 
 </head>
 <body>
-    <div id="spotFinder">
-        <label for="countries">Select Country</label>
-        <select name="countries" id="countries">
-        </select>
-        <div id="regionSelector">
-            <label for="region">Select Region</label>
-            <select name="region" id="region"></select>
-            <button id="findSpot">Find Spots</button>
-            <br>
-        </div>
+    <div>
+        <h1>Welcome to spot admin</h1>
     </div>
 
     <div id="spotPresenter">
+        <h2>Available spots</h2>
         <table>
             <thead>
                 <tr>
@@ -38,6 +31,24 @@
             </tbody>
         </table>
     </div>
+
+    <div>
+        <button id="addSpot">Add Spot</button>
+    </div>
+
+    <div id="spotFinder">
+        <h2>Find Spots</h2>
+        <label for="countries">Select Country</label>
+        <select name="countries" id="countries">
+        </select>
+        <div id="regionSelector">
+            <label for="region">Select Region</label>
+            <select name="region" id="region"></select>
+            <button id="findSpot">Find Spots</button>
+            <br>
+        </div>
+    </div>
+
      <!-- data- atribute sirve para agregar data custom a elementos https://www.w3schools.com/tags/att_data-.asp -->
     <div class="modal" id="modal">
         <div class="modal-header">

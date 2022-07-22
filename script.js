@@ -1,8 +1,7 @@
 /* Pendiente: La base de datos de paises regiones esta incorrecta, en chile da Marga Marga que es una provincia */
 /*Proximos pasos:
-- Refactorizamos el codigo para que no sea necesario el boton de elegir pais, hay que terminar de corregir ese codigo, 
-esta en el eventi listener ante un cambio en linea 64
-- La eleccion de direccion de viento tiene que ser una opcion.
+- Crear la opcion Add Spot, estoy pensando en re utilziar el codigo de "edit spot", tranformandolo en una funcion que 
+le entrego el parametro de que llamada a la API haer. 
 - En la herramienta de busqueda permitir la opcion ALL y agregar el endpoint al backend. 
 */
 
@@ -14,8 +13,17 @@ window.onload = () => {
     let findSpot = document.getElementById('findSpot');
     let spotList = document.getElementById('spotList');
     let selectRegion = document.getElementById('regionSelector');
+    let regionSelector = document.getElementById('region');
     let countryData;
     let countryCode;
+    let activeRegion;
+    let windDirectionData = [
+        { 'name': 'On Shore'},
+        { 'name': 'Off Shore'},
+        { 'name': 'Side On'},
+        { 'name': 'Side Off'},
+        { 'name': 'Side Shore'},
+    ];
 
     /* Aca comienza la funcionalidad de un modal que saque de este tutorial:  https://www.youtube.com/watch?v=MBaw_6cPmAw -----------------------*/
     
@@ -55,39 +63,26 @@ window.onload = () => {
         populateList(countriesSelector, "option", data, "code", "country");
         countryCode = countriesSelector.options[countriesSelector.selectedIndex].value;
         getRegions(countryCode).then(data => {
-            let regionSelector = document.getElementById('region');
             removeAllChildNodes(regionSelector);
             populateList(regionSelector, "option", data, "shortCode", "name");
+            activeRegion = data;
 
         }).catch(error => {console.log(error);});
 
         countriesSelector.addEventListener('change', () => {
-            console.log(`Se elige el pais ${countriesSelector.options[countriesSelector.selectedIndex].value}`);
+            getRegions(countriesSelector.options[countriesSelector.selectedIndex].value).then(data => {
+                activeRegion = data;
+                removeAllChildNodes(regionSelector);
+                populateList(regionSelector, "option", data, "shortCode", "name");
+    
+            }).catch(error => {console.log(error);});
+
         })
 
 
     }).catch(error => {
         console.log(error);
     });
-
-    /*
-                countryName.addEventListener('change', () =>{
-                console.log(`Se elige el pais ${countryName.options[countryName.selectedIndex].value}`);
-                let regiontochange = document.getElementById('regionEdit');
-                removeAllChildNodes(regiontochange);
-                let regionData;
-                getRegions(countryName.options[countryName.selectedIndex].value).then(data => {
-                    populateList(regiontochange, "option", data, "shortCode", "name");
-                    regionData = data;
-                    console.log(regionData);
-        
-                }).catch(error => {console.log(error);})
-                newSpotRegionEdit.appendChild(regionName);
-            })
-
-    
-    */
-
 
     /*----------- Populacion de tabla de spots ya existentes ------------------*/
     
@@ -99,7 +94,8 @@ window.onload = () => {
         let newSpotName = document.createElement('td');
         newSpotName.innerHTML = data.rows[i].name;
         let spotCountry = document.createElement('td');
-        spotCountry.innerHTML = data.rows[i].countryCode;
+        spotCountry.innerHTML = countryData[countryData.findIndex(country => country.code == data.rows[i].countryCode)].country;
+        spotCountry.dataset.countryCode = data.rows[i].countryCode;
         let spotRegion = document.createElement('td');
         spotRegion.innerHTML = data.rows[i].regionCode;
         let windDirection = document.createElement('td');
@@ -119,8 +115,6 @@ window.onload = () => {
             removeAllChildNodes(spotEditList);
 
             /*Poblamos la tabla del modal con los datos del spot a editar */
-            console.log(data.rows[i]);
-
             let newSpotEdit = document.createElement('tr');
 
             let newSpotNameEdit = document.createElement('td');
@@ -149,7 +143,6 @@ window.onload = () => {
             getRegions(data.rows[i].countryCode).then(data => {
                 populateList(regionName, "option", data, "shortCode", "name");
                 regionData = data;
-                console.log(regionData);
                 regionName.selectIndex = regionData.findIndex(region => region.shortCode == data.rows[i].regionCode);
     
             }).catch(error => {console.log(error);})
@@ -176,7 +169,9 @@ window.onload = () => {
 
 
             let newSpotWindDirectionEdit = document.createElement('td');
-            let windDirectionName = document.createElement('input');
+            let windDirectionName = document.createElement('select');
+            populateList(windDirectionName, "option", windDirectionData, "name", "name");
+
             windDirection.value = data.rows[i].windDirection;
             newSpotWindDirectionEdit.appendChild(windDirectionName);
             newSpotEdit.appendChild(newSpotWindDirectionEdit);
