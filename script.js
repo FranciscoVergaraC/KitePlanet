@@ -1,7 +1,5 @@
 /* Pendiente: La base de datos de paises regiones esta incorrecta, en chile da Marga Marga que es una provincia */
 /*Proximos pasos:
-- Crear la opcion Add Spot, estoy pensando en re utilziar el codigo de "edit spot", tranformandolo en una funcion que 
-le entrego el parametro de que llamada a la API haer. 
 - En la herramienta de busqueda permitir la opcion ALL y agregar el endpoint al backend. 
 */
 
@@ -24,6 +22,8 @@ window.onload = () => {
         { 'name': 'Side Off'},
         { 'name': 'Side Shore'},
     ];
+    let addspot = document.getElementById('addSpot');
+    addspot.dataset.modalTarget = '#modal';
 
     /* Aca comienza la funcionalidad de un modal que saque de este tutorial:  https://www.youtube.com/watch?v=MBaw_6cPmAw -----------------------*/
     
@@ -110,86 +110,91 @@ window.onload = () => {
         /* Modal de edicion de spot */
 
         editButton.onclick = () => { 
-            const modal = document.querySelector(editButton.dataset.modalTarget);
-            const spotEditList = document.getElementById('spotEditList');
-            removeAllChildNodes(spotEditList);
+                     /*Comenzamos a trabajar con el modal */
+                     const modal = document.querySelector(editButton.dataset.modalTarget);
+                     const spotEditList = document.getElementById('spotEditList');
+                     removeAllChildNodes(spotEditList);
+         
+                     /*Poblamos la tabla del modal con los datos del spot a editar */
+                     let newSpotEdit = document.createElement('tr');
+                     spotEditList.appendChild(newSpotEdit);
 
-            /*Poblamos la tabla del modal con los datos del spot a editar */
-            let newSpotEdit = document.createElement('tr');
+                     let newSpotNameEdit = document.createElement('td');
+                     let spotName = document.createElement('input');
+                     spotName.value = data.rows[i].name;
+                     newSpotNameEdit.appendChild(spotName);
+                     newSpotEdit.appendChild(newSpotNameEdit);
+                     
+         
+                     let newSpotCountryEdit = document.createElement('td');
+                     let countryName = document.createElement('select');
+                     populateList(countryName, "option", countryData, "code", "country");
+                     countryName.selectedIndex = countryData.findIndex(country => country.code == data.rows[i].countryCode);
+                     newSpotCountryEdit.appendChild(countryName);
+                     newSpotEdit.appendChild(newSpotCountryEdit);
 
-            let newSpotNameEdit = document.createElement('td');
-            let spotName = document.createElement('input');
-            spotName.value = data.rows[i].name;
-            newSpotNameEdit.appendChild(spotName);
-            newSpotEdit.appendChild(newSpotNameEdit);
-            spotEditList.appendChild(newSpotEdit);
+                     /* Populamos con el pais elegido y la region elegida*/
+         
+         
+                     let newSpotRegionEdit = document.createElement('td');
+                     let regionName = document.createElement('select');
+                     regionName.id = "regionEdit";
+         
+                     getRegions(data.rows[i].countryCode).then(data => {
+                         populateList(regionName, "option", data, "shortCode", "name");
+                     }).catch(error => {console.log(error);})
+                     
+                     
 
-            let newSpotCountryEdit = document.createElement('td');
-            let countryName = document.createElement('select');
-            populateList(countryName, "option", countryData, "code", "country");
-            countryName.selectedIndex = countryData.findIndex(country => country.code == data.rows[i].countryCode);
-            newSpotCountryEdit.appendChild(countryName);
-            newSpotEdit.appendChild(newSpotCountryEdit);
-            spotEditList.appendChild(newSpotEdit);
+                     newSpotRegionEdit.appendChild(regionName);
+                     newSpotEdit.appendChild(newSpotRegionEdit);
+         
+                     /* Si se cambia el pais elegido las regiones tienen que cambiar, eso lo manejamos aca */
+         
+                     countryName.addEventListener('change', () =>{
+                         console.log(`Se elige el pais ${countryName.options[countryName.selectedIndex].value}`);
+                         let regiontochange = document.getElementById('regionEdit');
+                         removeAllChildNodes(regiontochange);
+                         let regionData;
+                         getRegions(countryName.options[countryName.selectedIndex].value).then(data => {
+                             populateList(regiontochange, "option", data, "shortCode", "name");
+                             regionData = data;
+                             console.log(regionData);
+                 
+                         }).catch(error => {console.log(error);})
+                         newSpotRegionEdit.appendChild(regionName);
+                     })
+         
+         
+                     let newSpotWindDirectionEdit = document.createElement('td');
+                     let windDirectionName = document.createElement('select');
+                     populateList(windDirectionName, "option", windDirectionData, "name", "name");
+         
+                     windDirection.value = data.rows[i].windDirection;
+                     newSpotWindDirectionEdit.appendChild(windDirectionName);
+                     newSpotEdit.appendChild(newSpotWindDirectionEdit);
+         
+                     let newSpotId = document.createElement('td');
+                     newSpotId.innerHTML = data.rows[i].id;
+                     newSpotEdit.appendChild(newSpotId);
+         
+                     let editSpot = document.createElement('td');
+                     let innerEditButton = document.createElement('button');
+                     innerEditButton.innerHTML = "Edit";
+                     innerEditButton.id = 'editSpot';
+                     editSpot.appendChild(innerEditButton);
+                     newSpotEdit.appendChild(editSpot);
+                     let recognizedButton = document.getElementById('editSpot')
+                     recognizedButton.onclick = editSpotOnDb;
 
-            /* Populamos con el pais elegido y la region elegida*/
+                     let deleteButton = document.createElement('button');
+                     deleteButton.innerHTML = "Delete";
+                     deleteButton.id = 'deleteSpot';
+                     editSpot.appendChild(deleteButton);
+                     let deleteButtonPointer = document.getElementById('deleteSpot');
+                     deleteButtonPointer.onclick = deleteSpotOnDb;
 
-
-            let newSpotRegionEdit = document.createElement('td');
-            let regionName = document.createElement('select');
-            regionName.id = "regionEdit";
-            let regionData;
-
-            getRegions(data.rows[i].countryCode).then(data => {
-                populateList(regionName, "option", data, "shortCode", "name");
-                regionData = data;
-                regionName.selectIndex = regionData.findIndex(region => region.shortCode == data.rows[i].regionCode);
-    
-            }).catch(error => {console.log(error);})
-            
-            newSpotRegionEdit.appendChild(regionName);
-            newSpotEdit.appendChild(newSpotRegionEdit);
-            spotEditList.appendChild(newSpotEdit);
-
-            /* Si se cambia el pais elegido las regiones tienen que cambiar, eso lo manejamos aca */
-
-            countryName.addEventListener('change', () =>{
-                console.log(`Se elige el pais ${countryName.options[countryName.selectedIndex].value}`);
-                let regiontochange = document.getElementById('regionEdit');
-                removeAllChildNodes(regiontochange);
-                let regionData;
-                getRegions(countryName.options[countryName.selectedIndex].value).then(data => {
-                    populateList(regiontochange, "option", data, "shortCode", "name");
-                    regionData = data;
-                    console.log(regionData);
-        
-                }).catch(error => {console.log(error);})
-                newSpotRegionEdit.appendChild(regionName);
-            })
-
-
-            let newSpotWindDirectionEdit = document.createElement('td');
-            let windDirectionName = document.createElement('select');
-            populateList(windDirectionName, "option", windDirectionData, "name", "name");
-
-            windDirection.value = data.rows[i].windDirection;
-            newSpotWindDirectionEdit.appendChild(windDirectionName);
-            newSpotEdit.appendChild(newSpotWindDirectionEdit);
-            spotEditList.appendChild(newSpotEdit);
-
-            let newSpotId = document.createElement('td');
-            newSpotId.innerHTML = data.rows[i].id;
-            newSpotEdit.appendChild(newSpotId);
-
-            let editSpot = document.createElement('td');
-            let innerEditButton = document.createElement('button');
-            innerEditButton.innerHTML = "Edit";
-            innerEditButton.id = 'editSpot';
-            editSpot.appendChild(innerEditButton);
-            newSpotEdit.appendChild(editSpot);
-            let recognizedButton = document.getElementById('editSpot')
-            recognizedButton.onclick = editSpotOnDb;
-            openModal(modal);
+                     openModal(modal);
         };
         editSpot.appendChild(editButton);
         newSpot.appendChild(newSpotName);
@@ -201,11 +206,137 @@ window.onload = () => {
         spotList.appendChild(newSpot);
     }
 });
+
+addspot.onclick = () => {
+    const spotEditList = document.getElementById('spotEditList');
+    removeAllChildNodes(spotEditList);
+
+    let newSpotEdit = document.createElement('tr');
+    spotEditList.appendChild(newSpotEdit);
+
+    let newSpotNameEdit = document.createElement('td');
+    let spotName = document.createElement('input');
+    newSpotNameEdit.appendChild(spotName);
+    newSpotEdit.appendChild(newSpotNameEdit);
     
+
+    let newSpotCountryEdit = document.createElement('td');
+    let countryName = document.createElement('select');
+    populateList(countryName, "option", countryData, "code", "country");
+    newSpotCountryEdit.appendChild(countryName);
+    newSpotEdit.appendChild(newSpotCountryEdit);
+
+    /* Populamos con el pais elegido y la region elegida*/
+
+
+    let newSpotRegionEdit = document.createElement('td');
+    let regionName = document.createElement('select');
+    regionName.id = "regionEdit";
+    let regionData;
+
+    getRegions('AF').then(data => {
+        populateList(regionName, "option", data, "shortCode", "name");
+        regionData = data;
+
+    }).catch(error => {console.log(error);})
+    
+    newSpotRegionEdit.appendChild(regionName);
+    newSpotEdit.appendChild(newSpotRegionEdit);
+    /*spotEditList.appendChild(newSpotEdit);*/
+
+    /* Si se cambia el pais elegido las regiones tienen que cambiar, eso lo manejamos aca */
+
+    countryName.addEventListener('change', () =>{
+        console.log(`Se elige el pais ${countryName.options[countryName.selectedIndex].value}`);
+        let regiontochange = document.getElementById('regionEdit');
+        removeAllChildNodes(regiontochange);
+        let regionData;
+        getRegions(countryName.options[countryName.selectedIndex].value).then(data => {
+            populateList(regiontochange, "option", data, "shortCode", "name");
+            regionData = data;
+            console.log(regionData);
+
+        }).catch(error => {console.log(error);})
+        newSpotRegionEdit.appendChild(regionName);
+    })
+
+
+    let newSpotWindDirectionEdit = document.createElement('td');
+    let windDirectionName = document.createElement('select');
+    populateList(windDirectionName, "option", windDirectionData, "name", "name");
+
+    newSpotWindDirectionEdit.appendChild(windDirectionName);
+    newSpotEdit.appendChild(newSpotWindDirectionEdit);
+    spotEditList.appendChild(newSpotEdit);
+
+    let newSpotId = document.createElement('td');
+    newSpotEdit.appendChild(newSpotId);
+
+    let createSpot = document.createElement('td');
+    let innerEditButton = document.createElement('button');
+    innerEditButton.innerHTML = "Add";
+    innerEditButton.id = 'createSpot';
+    createSpot.appendChild(innerEditButton);
+    newSpotEdit.appendChild(createSpot);
+    let recognizedButton = document.getElementById('createSpot')
+    recognizedButton.onclick = createSpotOnDb;
+    openModal(modal);
+}
 
 };
 
+const deleteSpotOnDb = async (event) => {
+    const basePath = event.path
+    const spotId = basePath[2].childNodes[4].innerHTML;
+    console.log(`Se enviara a eliminar el spot con id ${spotId}`);
+    try {
+        const response = await fetch('http://localhost:4001/deletespot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: spotId
+            })
+        });
+        const data = await response.json();
+        alert("Spot eliminado con exito");
+        closeModal(modal);
+        location.reload();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
+const createSpotOnDb = async (event) =>{
+    const basePath = event.path
+    const spotName = basePath[2].childNodes[0].children[0].value;
+    const spotCountry = basePath[2].childNodes[1].children[0].value;
+    const spotRegion = basePath[2].childNodes[2].children[0].value;
+    const spotWindDirection = basePath[2].childNodes[3].children[0].value;
+    const spotId = basePath[2].childNodes[4].innerHTML;
+    console.log(`Se enviara una consulta con los siguientes datos: Name: ${spotName}, Country: ${spotCountry}, Region: ${spotRegion}, WindDirection: ${spotWindDirection}, Id: ${spotId}`);
+    try {
+        const response = await fetch('http://localhost:4001/newspot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: spotName,
+                countryCode: spotCountry,
+                regionCode: spotRegion,
+                windDirection: spotWindDirection,
+            })
+        });
+        const data = await response.json();
+        alert("Spot creado con exito");
+        closeModal(modal);
+        location.reload();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 const editSpotOnDb = async (event) => {
     const basePath = event.path
