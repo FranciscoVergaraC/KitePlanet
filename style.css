@@ -1,27 +1,84 @@
 *{
     font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
 }
+
+html{
+    font-size: 16px;
+    margin: 0;
+}
+
 
 #navbar{
     display: flex;
     position: sticky;
-    background-color: white;
+    background-color: rgb(31, 159, 197);
     height: 5rem;
     justify-content: center;
     align-items: center;
     min-width: 750px;
+    margin: 0;
 }
 
+#navbar h1{
+    color: white;
+    font-size: 2rem;
+    margin: 0;
+}
 
 #findSpot{
 }
 
+table{
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+}
+
+td {
+    text-align: center;
+}
+
+button{
+    background-color: rgb(31, 159, 197);
+    border-radius: 5px;
+    border: 1px solid white;
+    padding: 5px;
+    font-weight: bold;
+    color: white;
+}
+
+button:hover{
+    background-color: aquamarine;
+    color: black;
+}
+
+
 #regionSelector{
+}
+
+#addSpot{
+    margin-left: 30px;
+}
+
+.modal-body button{
+    width: 100%;
 }
 
 #spotPresenter{
     margin-top: 20px;
     margin-bottom: 20px;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+#spotPresenter button{
+    width: 100%;
+}
+
+#spotPresenter h2{
+    margin-bottom: 10px;
+    font-size: 1.5rem;
 }
 
 table, th, td{
@@ -65,6 +122,9 @@ table, th, td{
     background: none;
     font-size: 1.2rem;
     font-weight: bold;
+    background-color: rgb(31, 159, 197);
+    width: 32px;
+    text-align: center;
 }
 
 .modal-body {
@@ -86,4 +146,8 @@ table, th, td{
 #overlay.active {
     opacity: 1;
     pointer-events: all;
+}
+
+.close-button{
+    background-color: rgb(31, 159, 197);
 }
